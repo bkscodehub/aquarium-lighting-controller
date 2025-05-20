@@ -1,7 +1,8 @@
+#include <ArduinoJson.h>
 #include "light_controller.h"
 #include "config.h"
 #include "mqtt_manager.h"
-#include <ArduinoJson.h>
+#include <ESP8266WiFi.h>
 
 LightMode currentMode = MANUAL;
 bool lightState = false;
