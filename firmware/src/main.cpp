@@ -11,8 +11,8 @@ void setup() {
   pinMode(STATUS_LED_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
   digitalWrite(STATUS_LED_PIN, HIGH); // Active low LED
-
-  connectToWiFi();
+  
+  connectToWiFi(WIFI_SSID, WIFI_PASS);
   setupMQTT(MQTT_TOPIC_CMD, MQTT_TOPIC_SCHEDULE);
 
   publishStatus();  // Initial status
