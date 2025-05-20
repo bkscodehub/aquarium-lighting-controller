@@ -33,3 +33,4 @@
 
 # PlatformIO files
 .pio/
+firmware/include/env.h
