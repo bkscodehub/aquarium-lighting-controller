@@ -33,3 +33,6 @@
 
 # PlatformIO files
 .pio/
+
+# vscode
+.vscode/

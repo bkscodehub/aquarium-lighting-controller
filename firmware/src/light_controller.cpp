@@ -9,6 +9,9 @@ bool lightState = false;
 unsigned long lastStatusPublish = 0;
 unsigned long lastCommandTime = 0;
 
+int scheduledOnHour = -1, scheduledOnMinute = -1;
+int scheduledOffHour = -1, scheduledOffMinute = -1;
+
 // Replace with time-keeping implementation if using NTP later
 String getTimestamp() {
   return String(millis() / 1000) + "s";
@@ -20,39 +23,89 @@ void setLight(bool state) {
   digitalWrite(STATUS_LED_PIN, state ? LOW : HIGH); // Status LED
 }
 
-void handleCommandMessage(String payload) {
-  DynamicJsonDocument doc(256);
-  deserializeJson(doc, payload);
-
-  String cmd = doc["cmd"];
-  String mode = doc["mode"];
-
-  if (cmd == "on") setLight(true);
-  else if (cmd == "off") setLight(false);
-
-  if (mode == "manual") currentMode = MANUAL;
-  else if (mode == "auto") currentMode = AUTO;
-
-  lastCommandTime = millis();
-
-  // Acknowledge
-  DynamicJsonDocument ack(256);
-  ack["cmd_received"] = cmd;
-  ack["new_mode"] = (currentMode == AUTO ? "auto" : "manual");
-  ack["timestamp"] = getTimestamp();
-  ack["source"] = "mqtt";
-
-  publishMessage(MQTT_TOPIC_ACK, ack);
-  publishStatus();
+void handleCommandMessage(const String& topic, const String& payload) {
+  if (topic == MQTT_TOPIC_CMD) {
+    ArduinoJson::DynamicJsonDocument doc(256);
+    deserializeJson(doc, payload);
+  
+    String cmd = doc["cmd"];
+    String mode = doc["mode"];
+  
+    if (cmd == "on") setLight(true);
+    else if (cmd == "off") setLight(false);
+  
+    if (mode == "manual") currentMode = MANUAL;
+    else if (mode == "auto") currentMode = AUTO;
+  
+    lastCommandTime = millis();
+  
+    // Acknowledge
+    ArduinoJson::DynamicJsonDocument ack(256);
+    ack["cmd_received"] = cmd;
+    ack["new_mode"] = (currentMode == AUTO ? "auto" : "manual");
+    ack["timestamp"] = getTimestamp();
+    ack["source"] = "mqtt";
+  
+    publishMessage(MQTT_TOPIC_ACK, ack);
+    publishStatus();
+  } else {
+    Serial.print("Topic mismatch. Expected ");
+    Serial.print(MQTT_TOPIC_CMD);
+    Serial.print(" but received ");
+    Serial.println(topic);
+  }
 }
 
-void handleScheduleMessage(String payload) {
-  // Placeholder for handling schedule config via JSON
+void handleScheduleMessage(const String& topic, const String& payload) {
+  if (topic == MQTT_TOPIC_SCHEDULE) {
+    DynamicJsonDocument doc(256);
+    DeserializationError error = deserializeJson(doc, payload);
+    
+    if (error) {
+      Serial.print("Failed to parse schedule message: ");
+      Serial.println(error.c_str());
+      return;
+    }
+
+    String onTime = doc["on"];
+    String offTime = doc["off"];
+
+    if (sscanf(onTime.c_str(), "%d:%d", &scheduledOnHour, &scheduledOnMinute) != 2 ||
+        sscanf(offTime.c_str(), "%d:%d", &scheduledOffHour, &scheduledOffMinute) != 2) {
+      Serial.println("Invalid time format in schedule message. Expected HH:MM.");
+      return;
+    }
+
+    Serial.print("Schedule set - ON at ");
+    Serial.print(scheduledOnHour);
+    Serial.print(":");
+    Serial.print(scheduledOnMinute);
+    Serial.print(", OFF at ");
+    Serial.print(scheduledOffHour);
+    Serial.print(":");
+    Serial.println(scheduledOffMinute);
+  } else {
+    Serial.print("Topic mismatch. Expected ");
+    Serial.print(MQTT_TOPIC_SCHEDULE);
+    Serial.print(" but received ");
+    Serial.println(topic);
+  }
 }
 
 void handleScheduledLightControl() {
   if (currentMode == AUTO) {
-    // Check if it's time to turn on/off the light (you can expand this)
+    // Simulated current time from millis()
+    unsigned long msSinceBoot = millis();
+    unsigned long seconds = msSinceBoot / 1000;
+    int currentHour = (seconds / 3600) % 24;
+    int currentMinute = (seconds / 60) % 60;
+
+    bool shouldTurnOn = (currentHour > scheduledOnHour || 
+                         (currentHour == scheduledOnHour && currentMinute >= scheduledOnMinute)) &&
+                        (currentHour < scheduledOffHour || 
+                         (currentHour == scheduledOffHour && currentMinute < scheduledOffMinute));
+
+    setLight(shouldTurnOn);
   }
 
   if (millis() - lastStatusPublish > 600000) {  // Every 10 minutes
@@ -61,8 +114,30 @@ void handleScheduledLightControl() {
   }
 }
 
+void setupMQTT() {
+  Serial.begin(115200);
+
+  // Define topic-callback mappings
+  static MqttCallbackEntry callbacks[] = {
+    { "/aquarium/cmd", handleCommandMessage },
+    { "/aquarium/schedule", handleScheduleMessage }
+  };
+
+  const char* portStr = getenv("HIVEMQ_PORT");
+  char* end;
+  int port = strtol(portStr, &end, 10);
+  
+  if (*end != '\0') {
+    Serial.println("Invalid port value from environment");  // Handle error
+    port = 8883;  // set to default
+  }
+
+  // Initialize MQTT
+  initMQTT(getenv("HIVEMQ_BROKER_URL"), getenv("HIVEMQ_USERNAME"), getenv("HIVEMQ_PASSWORD"), port, callbacks, sizeof(callbacks) / sizeof(callbacks[0]));
+}
+
 void publishStatus() {
-  DynamicJsonDocument status(256);
+  ArduinoJson::DynamicJsonDocument status(256);
   status["light"] = lightState ? "on" : "off";
   status["mode"] = (currentMode == AUTO ? "auto" : "manual");
   status["last_cmd"] = lastCommandTime;

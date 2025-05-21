@@ -8,6 +8,7 @@ enum LightMode { MANUAL, AUTO };
 extern LightMode currentMode;
 extern bool lightState;
 
+void setupMQTT();
 void handleCommandMessage(String payload);
 void handleScheduleMessage(String payload);
 void handleScheduledLightControl();

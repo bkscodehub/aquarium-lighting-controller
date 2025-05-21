@@ -14,7 +14,7 @@ void setup() {
   digitalWrite(STATUS_LED_PIN, HIGH); // Active low LED
   
   connectToWiFi(WIFI_SSID, WIFI_PASS);
-  setupMQTT(MQTT_TOPIC_CMD, MQTT_TOPIC_SCHEDULE);
+  setupMQTT();
 
   publishStatus();  // Initial status
 }
@@ -22,4 +22,5 @@ void setup() {
 void loop() {
   loopMQTT();
   handleScheduledLightControl();  // Periodically check schedule
+  delay(15000);  // poll again after 15 seconds
 }
