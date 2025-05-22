@@ -3,6 +3,7 @@
 #include "config.h"
 #include "mqtt_manager.h"
 #include <ESP8266WiFi.h>
+#include "env.h"
 
 LightMode currentMode = MANUAL;
 bool lightState = false;
@@ -123,17 +124,8 @@ void setupMQTT() {
     { "/aquarium/schedule", handleScheduleMessage }
   };
 
-  const char* portStr = getenv("MQTT_PORT");
-  char* end;
-  int port = strtol(portStr, &end, 10);
-  
-  if (*end != '\0') {
-    Serial.println("Invalid port value from environment");  // Handle error
-    port = 8883;  // set to default
-  }
-
   // Initialize MQTT
-  initMQTT(getenv("MQTT_BROKER"), getenv("MQTT_USERNAME"), getenv("MQTT_PASSWORD"), port, callbacks, sizeof(callbacks) / sizeof(callbacks[0]));
+  initMQTT(MQTT_BROKER, MQTT_USERNAME, MQTT_PASSWORD, MQTT_PORT, callbacks, sizeof(callbacks) / sizeof(callbacks[0]));
 }
 
 void publishStatus() {

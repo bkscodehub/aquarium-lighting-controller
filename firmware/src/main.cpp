@@ -14,11 +14,11 @@ void setup() {
   digitalWrite(STATUS_LED_PIN, HIGH); // Active low LED
   
   Serial.print("SSID and Password from env file: ");
-  Serial.print(getenv("WIFI_SSID"));
+  Serial.print(WIFI_SSID);
   Serial.print("/");
-  Serial.println(getenv("WIFI_PASSWORD"));
+  Serial.println(WIFI_PASSWORD);
 
-  connectToWiFi(getenv("WIFI_SSID"), getenv("WIFI_PASSWORD"));
+  connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
   setupMQTT();
 
   publishStatus();  // Initial status
