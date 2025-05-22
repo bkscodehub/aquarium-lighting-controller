@@ -13,18 +13,13 @@
 #endif
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(STATUS_LED_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
   digitalWrite(STATUS_LED_PIN, HIGH); // Active low LED
   
-  Serial.print("SSID and Password from env file: ");
-  Serial.print(WIFI_SSID);
-  Serial.print("/");
-  Serial.println(WIFI_PASSWORD);
-
   connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
   setupMQTT();
 
