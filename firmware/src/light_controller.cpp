@@ -123,7 +123,7 @@ void setupMQTT() {
     { "/aquarium/schedule", handleScheduleMessage }
   };
 
-  const char* portStr = getenv("HIVEMQ_PORT");
+  const char* portStr = getenv("MQTT_PORT");
   char* end;
   int port = strtol(portStr, &end, 10);
   
@@ -133,7 +133,7 @@ void setupMQTT() {
   }
 
   // Initialize MQTT
-  initMQTT(getenv("HIVEMQ_BROKER_URL"), getenv("HIVEMQ_USERNAME"), getenv("HIVEMQ_PASSWORD"), port, callbacks, sizeof(callbacks) / sizeof(callbacks[0]));
+  initMQTT(getenv("MQTT_BROKER"), getenv("MQTT_USERNAME"), getenv("MQTT_PASSWORD"), port, callbacks, sizeof(callbacks) / sizeof(callbacks[0]));
 }
 
 void publishStatus() {

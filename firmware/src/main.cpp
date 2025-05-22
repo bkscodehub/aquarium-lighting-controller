@@ -13,7 +13,7 @@ void setup() {
   digitalWrite(RELAY_PIN, LOW);
   digitalWrite(STATUS_LED_PIN, HIGH); // Active low LED
   
-  connectToWiFi(WIFI_SSID, WIFI_PASS);
+  connectToWiFi(getenv("WIFI_SSID"), getenv("WIFI_PASSWORD"));
   setupMQTT();
 
   publishStatus();  // Initial status
