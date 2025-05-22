@@ -3,7 +3,22 @@
 #include "config.h"
 #include "mqtt_manager.h"
 #include <ESP8266WiFi.h>
-#include "env.h"
+
+#ifndef MQTT_BROKER
+#define MQTT_BROKER "default_broker_url"
+#endif
+
+#ifndef MQTT_USERNAME
+#define MQTT_USERNAME "default_mqtt_username"
+#endif
+
+#ifndef MQTT_PASSWORD
+#define MQTT_PASSWORD "default_password"
+#endif
+
+#ifndef MQTT_PORT
+#define MQTT_PORT 8883
+#endif
 
 LightMode currentMode = MANUAL;
 bool lightState = false;

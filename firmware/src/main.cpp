@@ -1,9 +1,16 @@
 #include <Arduino.h>
-#include "env.h"
 #include "config.h"
 #include "light_controller.h"
 #include "wifi_manager.h"
 #include "mqtt_manager.h"
+
+#ifndef WIFI_SSID
+#define WIFI_SSID "default_ssid"
+#endif
+
+#ifndef WIFI_PASSWORD
+#define WIFI_PASSWORD "default_pass"
+#endif
 
 void setup() {
   Serial.begin(115200);
