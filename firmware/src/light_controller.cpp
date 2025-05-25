@@ -125,7 +125,7 @@ void handleScheduledLightControl() {
   }
 
   if (millis() - lastStatusPublish > 600000) {  // Every 10 minutes
-    publishStatus();
+//    publishStatus();
     lastStatusPublish = millis();
   }
 }

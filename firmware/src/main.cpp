@@ -20,14 +20,19 @@ void setup() {
   digitalWrite(RELAY_PIN, LOW);
   digitalWrite(STATUS_LED_PIN, HIGH); // Active low LED
   
+  Serial.println("1. CONNECT TO WIFI");
   connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
-  setupMQTT();
+  Serial.println("2. SETUP MQTT CONNECTION");
+//  setupMQTT();
 
-  publishStatus();  // Initial status
+  Serial.println("3. PUBLISH STATUS");
+//  publishStatus();  // Initial status
+  
+  Serial.println("SETUP COMPLETE!");
 }
 
 void loop() {
-  loopMQTT();
+//  loopMQTT();
   handleScheduledLightControl();  // Periodically check schedule
   delay(15000);  // poll again after 15 seconds
 }
