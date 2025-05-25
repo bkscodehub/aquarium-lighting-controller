@@ -20,9 +20,7 @@
 #define MQTT_PORT 8883
 #endif
 
-#ifndef MQTT_SSL
-#define MQTT_SSL R"(
-  -----BEGIN CERTIFICATE-----
+static const char* MQTT_SSL = R"(-----BEGIN CERTIFICATE-----
   MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
   TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
   cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
@@ -52,9 +50,7 @@
   4RgqsahDYVvTH9w7jXbyLeiNdd8XM2w9U/t7y0Ff/9yi0GE44Za4rF2LN9d11TPA
   mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
   emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
-  -----END CERTIFICATE-----
-)"
-#endif
+  -----END CERTIFICATE-----)";
 
 LightMode currentMode = MANUAL;
 bool lightState = false;
