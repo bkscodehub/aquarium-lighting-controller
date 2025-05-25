@@ -23,7 +23,7 @@ void setup() {
   Serial.println("1. CONNECT TO WIFI");
   connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
   Serial.println("2. SETUP MQTT CONNECTION");
-//  setupMQTT();
+  setupMQTT();
 
   Serial.println("3. PUBLISH STATUS");
 //  publishStatus();  // Initial status
