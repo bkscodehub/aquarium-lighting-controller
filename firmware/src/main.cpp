@@ -26,13 +26,13 @@ void setup() {
   setupMQTT();
 
   Serial.println("3. PUBLISH STATUS");
-//  publishStatus();  // Initial status
+  publishStatus();  // Initial status
   
   Serial.println("SETUP COMPLETE!");
 }
 
 void loop() {
-//  loopMQTT();
+  loopMQTT();
   handleScheduledLightControl();  // Periodically check schedule
   delay(15000);  // poll again after 15 seconds
 }

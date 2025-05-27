@@ -3,9 +3,10 @@
 
 #include <Arduino.h>
 
-enum LightMode { MANUAL, AUTO };
+enum LightMode { MANUAL, AUTO, NONE };
 
 extern LightMode currentMode;
+extern LightMode prevMode;
 extern bool lightState;
 
 void setupMQTT();
