@@ -13,7 +13,7 @@
 #endif
 
 void setup() {
-  Serial.begin(74880);
+  Serial.begin(115200);
 
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(STATUS_LED_PIN, OUTPUT);
