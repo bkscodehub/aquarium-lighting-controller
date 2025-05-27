@@ -201,7 +201,7 @@ void handleScheduledLightControl() {
 }
 
 void setupMQTT() {
-  Serial.begin(115200);
+//  Serial.begin(115200);
 
   // Define topic-callback mappings
   static MqttCallbackEntry callbacks[] = {

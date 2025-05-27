@@ -13,13 +13,14 @@
 #endif
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(STATUS_LED_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
   digitalWrite(STATUS_LED_PIN, HIGH); // Active low LED
-  
+
+  delay(5000);
   Serial.println("1. CONNECT TO WIFI");
   connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
   Serial.println("2. SETUP MQTT CONNECTION");
