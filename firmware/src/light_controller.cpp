@@ -96,6 +96,8 @@ String cmd = "";  // "ON" | "OFF" | "AUTO"
 String source = "";  // "dashboard" | "mqtt_api" | "manual"
 
 void setLight(bool state) {
+  Serial.print("Turn Aquarium light ");
+  Serial.println(state?"ON":"OFF");
   lightState = state;
   digitalWrite(RELAY_PIN, state ? HIGH : LOW);
   digitalWrite(STATUS_LED_PIN, state ? LOW : HIGH); // Status LED
@@ -222,8 +224,6 @@ void handleScheduleMessage(const String& topic, const String& payload) {
 }
 
 void handleScheduledLightControl() {
-  Serial.print("checking mode: ");
-  Serial.println(currentMode);
   if (currentMode == AUTO) {
     int currentHour = getHourNow();
     int currentMinute = getMinuteNow();
@@ -233,7 +233,7 @@ void handleScheduledLightControl() {
                         (currentHour < scheduledOffHour || 
                          (currentHour == scheduledOffHour && currentMinute < scheduledOffMinute));
 
-    setLight(shouldTurnOn);
+    if(lightState != shouldTurnOn) setLight(shouldTurnOn);  // Toggle aquarium light
   }
 
   if (millis() - lastStatusPublish > 1000*60*30) {  // Every 30 minutes
