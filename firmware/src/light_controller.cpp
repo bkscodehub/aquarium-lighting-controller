@@ -199,6 +199,8 @@ void handleScheduleMessage(const String& topic, const String& payload) {
 }
 
 void handleScheduledLightControl() {
+  Serial.print("checking mode: ");
+  Serial.println(currentMode);
   if (currentMode == AUTO) {
     int currentHour = getHourNow();
     int currentMinute = getMinuteNow();
@@ -212,6 +214,7 @@ void handleScheduledLightControl() {
   }
 
   if (millis() - lastStatusPublish > 600000) {  // Every 10 minutes
+    Serial.println("Publishing status after 10 mins");
     publishStatus();
     lastStatusPublish = millis();
   }
