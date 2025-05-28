@@ -227,6 +227,20 @@ void handleScheduledLightControl() {
   if (currentMode == AUTO) {
     int currentHour = getHourNow();
     int currentMinute = getMinuteNow();
+    Serial.print("Current time - ");
+    Serial.print(currentHour);
+    Serial.print(":");
+    Serial.println(currentMinute);
+
+    Serial.print("Schedule ON time - ");
+    Serial.print(scheduledOnHour);
+    Serial.print(":");
+    Serial.println(scheduledOnMinute);
+    
+    Serial.print("Schedule OFF time - ");
+    Serial.print(scheduledOffHour);
+    Serial.print(":");
+    Serial.println(scheduledOffMinute);
 
     bool shouldTurnOn = (currentHour > scheduledOnHour || 
                          (currentHour == scheduledOnHour && currentMinute >= scheduledOnMinute)) &&
