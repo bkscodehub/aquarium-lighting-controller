@@ -22,7 +22,6 @@ void setup() {
 
   delay(5000);
   Serial.println("Initializing...");
-  setWiFiStatusLED(WIFI_LED_PIN);
   connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
   setupMQTT();
 

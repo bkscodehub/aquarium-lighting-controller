@@ -83,7 +83,7 @@ mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
 emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 -----END CERTIFICATE-----)";
 
-LightMode currentMode = MANUAL;
+LightMode currentMode = NONE;
 LightMode prevMode = NONE;
 bool lightState = false;
 
@@ -115,7 +115,6 @@ void handleCommandMessage(const String& topic, const String& payload) {
     cmd = doc["command"].as<String>();  // "ON" | "OFF" | "AUTO"
     source = doc["source"].as<String>();  // "dashboard" | "mqtt_api" | "manual"
 
-    prevMode = currentMode;
     bool changed = false;
     bool success = true;
   
@@ -128,6 +127,7 @@ void handleCommandMessage(const String& topic, const String& payload) {
     } else if (cmd == "AUTO") {
       currentMode = AUTO;
     } else {
+      currentMode = NONE;
       success = false;
     }
     
@@ -148,6 +148,7 @@ void handleCommandMessage(const String& topic, const String& payload) {
     Serial.println("Publish acknowledgement");
     publishMessage(MQTT_TOPIC_ACK, ack);
     publishStatus();
+    prevMode = currentMode;
   } else {
     Serial.print("ERROR: Topic mismatch! Expected ");
     Serial.print(MQTT_TOPIC_CMD);
