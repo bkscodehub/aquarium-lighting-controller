@@ -114,10 +114,6 @@ void handleCommandMessage(const String& topic, const String& payload) {
     
     cmd = doc["command"].as<String>();  // "ON" | "OFF" | "AUTO"
     source = doc["source"].as<String>();  // "dashboard" | "mqtt_api" | "manual"
-    Serial.print("Command received: ");
-    Serial.print(cmd);
-    Serial.println(" ,from source: ");
-    Serial.println(source);
 
     prevMode = currentMode;
     bool changed = false;
@@ -185,12 +181,6 @@ void handleScheduleMessage(const String& topic, const String& payload) {
   String source = doc["source"] | "unknown";
   bool enabled = doc["enabled"] | true;
 
-  Serial.print("Schedule received - On-time:");
-  Serial.print(onTime);
-  Serial.print(", Off-time:");
-  Serial.print(offTime);
-  Serial.print(", from source:");
-  Serial.println(source);
   // Validate time formats
   if (sscanf(onTime.c_str(), "%d:%d", &scheduledOnHour, &scheduledOnMinute) != 2 ||
       sscanf(offTime.c_str(), "%d:%d", &scheduledOffHour, &scheduledOffMinute) != 2) {
@@ -222,12 +212,12 @@ void handleScheduleMessage(const String& topic, const String& payload) {
   ack["success"] = true;
   ack["source"] = source;
   
-  // Serialize and print JSON
-  serializeJson(ack, Serial);
+  serializeJson(ack, Serial);  // Serialize and print JSON
   Serial.println();  // Ensure a new line for better readability
   
   Serial.println("Publish acknowledgement");
   publishMessage(MQTT_TOPIC_ACK, ack);
+  publishStatus();
 }
 
 void handleScheduledLightControl() {
@@ -245,8 +235,7 @@ void handleScheduledLightControl() {
     setLight(shouldTurnOn);
   }
 
-  if (millis() - lastStatusPublish > 600000) {  // Every 10 minutes
-    Serial.println("Publishing status after 10 mins");
+  if (millis() - lastStatusPublish > 1000*60*30) {  // Every 30 minutes
     publishStatus();
     lastStatusPublish = millis();
   }
