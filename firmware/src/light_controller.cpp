@@ -1,6 +1,7 @@
 #include <ArduinoJson.h>
 #include "light_controller.h"
 #include "config.h"
+#include <time_utils.h>
 #include "mqtt_manager.h"
 #include <ESP8266WiFi.h>
 
@@ -242,10 +243,7 @@ void handleScheduledLightControl() {
     Serial.print(":");
     Serial.println(scheduledOffMinute);
 
-    bool shouldTurnOn = (currentHour > scheduledOnHour || 
-                         (currentHour == scheduledOnHour && currentMinute >= scheduledOnMinute)) &&
-                        (currentHour < scheduledOffHour || 
-                         (currentHour == scheduledOffHour && currentMinute < scheduledOffMinute));
+    bool shouldTurnOn = isTimeInRange(scheduledOnHour, scheduledOnMinute, scheduledOffHour, scheduledOffMinute);
 
     if(lightState != shouldTurnOn) setLight(shouldTurnOn);  // Toggle aquarium light
   }
