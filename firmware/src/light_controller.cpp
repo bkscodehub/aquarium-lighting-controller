@@ -70,8 +70,9 @@ void setLight(bool state)
   Serial.print("Turn Aquarium light ");
   Serial.println(state ? "ON" : "OFF");
   lightState = state;
-  digitalWrite(RELAY_PIN, state ? HIGH : LOW);
-  digitalWrite(STATUS_LED_PIN, state ? LOW : HIGH); // Status LED
+  digitalWrite(STATUS_LED_PIN, state ? HIGH : LOW); // Status LED
+  // LOW → Relay ON (contacts switch) | HIGH → Relay OFF(NO stays open)
+  digitalWrite(RELAY_PIN, state ? LOW : HIGH);
 }
 
 void handleCommandMessage(const String &topic, const String &payload)
