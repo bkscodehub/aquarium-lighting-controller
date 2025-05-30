@@ -223,11 +223,6 @@ void handleScheduledLightControl()
 
     if (lightState != shouldTurnOn)
     {
-      Serial.print("Toggle light ");
-      Serial.print(lightState);
-      Serial.print(" to");
-      Serial.println(shouldTurnOn);
-
       setLight(shouldTurnOn); // Toggle aquarium light
     }
   }
