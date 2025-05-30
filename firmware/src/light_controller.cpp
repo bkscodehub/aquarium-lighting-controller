@@ -67,7 +67,7 @@ String source = ""; // "dashboard" | "mqtt_api" | "manual"
 
 void setLight(bool state)
 {
-  Serial.print("Turn Aquarium light ");
+  Serial.print("Turning Aquarium light ");
   Serial.println(state ? "ON" : "OFF");
   lightState = state;
   digitalWrite(STATUS_LED_PIN, state ? HIGH : LOW); // Status LED
@@ -224,6 +224,7 @@ void handleScheduledLightControl()
     if (lightState != shouldTurnOn)
     {
       setLight(shouldTurnOn); // Toggle aquarium light
+      publishStatus();
     }
   }
 
