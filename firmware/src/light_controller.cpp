@@ -21,38 +21,7 @@
 #define MQTT_PORT 8883
 #endif
 
-// static const char* MQTT_SSL = R"(-----BEGIN CERTIFICATE-----
-// MIIFPDCCBCSgAwIBAgISBlvO6+BhAYoAodu3Tizj+vEDMA0GCSqGSIb3DQEBCwUA
-// MDMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQwwCgYDVQQD
-// EwNSMTEwHhcNMjUwNDIyMjA1OTMwWhcNMjUwNzIxMjA1OTI5WjAfMR0wGwYDVQQD
-// DBQqLnMxLmV1LmhpdmVtcS5jbG91ZDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
-// AQoCggEBAKVuz2sMPmxx2w/f81/YAEKTbNZMJPk2+ooLFg5hxXvReF+AwIT4XvZ+
-// MLhSKvFxmghJF+BB9WyhqrcJLGDCP4s6SOLWTYixEoTcaLUviqqn+06kYqDJ6E83
-// NGsc7T42DlPnzqcZZjPRed9rt4CP3RgeZlWyYZgiD8FoJG9gie8ytihF/FkGZT8T
-// N4Vkl2vQa3mfBWeeKrcuhcLPxqIWDz/30iYfLtEe5JYYScoCKTXcP9SUStjpR8pD
-// vfOWdvasOAuBy7yBbx01/4lcQt50hfbhTR/K14/D4rNkuuvU7ktSQnoxVXC8YDwG
-// zkny10DFt65mVYLNZcBQtOLHHOZGV30CAwEAAaOCAlwwggJYMA4GA1UdDwEB/wQE
-// AwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDAYDVR0TAQH/BAIw
-// ADAdBgNVHQ4EFgQUgsEjDU35+EWJKBsFxJ0lM0PXMi4wHwYDVR0jBBgwFoAUxc9G
-// pOr0w8B6bJXELbBeki8m47kwVwYIKwYBBQUHAQEESzBJMCIGCCsGAQUFBzABhhZo
-// dHRwOi8vcjExLm8ubGVuY3Iub3JnMCMGCCsGAQUFBzAChhdodHRwOi8vcjExLmku
-// bGVuY3Iub3JnLzAzBgNVHREELDAqghQqLnMxLmV1LmhpdmVtcS5jbG91ZIISczEu
-// ZXUuaGl2ZW1xLmNsb3VkMBMGA1UdIAQMMAowCAYGZ4EMAQIBMC0GA1UdHwQmMCQw
-// IqAgoB6GHGh0dHA6Ly9yMTEuYy5sZW5jci5vcmcvNC5jcmwwggEFBgorBgEEAdZ5
-// AgQCBIH2BIHzAPEAdgAN4fIwK9MNwUBiEgnqVS78R3R8sdfpMO8OQh60fk6qNAAA
-// AZZfgg0JAAAEAwBHMEUCIQCENUD4FWITFwnyxsOr4D54wR+LUgZyEjwMd+GwHiha
-// agIgOdeXyofPYtzl2DajwNvR+6XbCikAbbQvZTZ4Eahu2coAdwDM+w9qhXEJZf6V
-// m1PO6bJ8IumFXA2XjbapflTA/kwNsAAAAZZfghU/AAAEAwBIMEYCIQDu8/zVPYFl
-// bmd1vt5Fqk0sXJLV+MEFhQH75Kn6jlvtFgIhAOA8DAE1QBWXxmYSyFXw9UvC4EvH
-// 4+VR1cA8merS5vl4MA0GCSqGSIb3DQEBCwUAA4IBAQBVET3hPDZX/protLVPy/vX
-// 4i41k5J3teGokrEMu/TdMN6i/W7555Vsgl1zXj5a1f+4FsQ2Nfh1sDMuz/Djzgxp
-// M8HMifB5HJTX+slAuElLzlQFCxMVNn3+b4BgpxvwA3srrXGudF3cya0qztg5lNju
-// y6zAjYfxMQA0uHtCSuxKk033uFkeBv1ui3XWC1JcISbsoF47RVBp/a5O3kBr+j18
-// k5qL7dWcKWr2S9JctGCH4ezYNmAG9W6w/KoTHH3HJCWrTzziJutY48Rwt4gJcS1s
-// OSV8OT5pGKVpVnKSSOz4ItIaqis6fdetTiba38lUyzjDNklYL72Ye4Ck+qvjyc33
-// -----END CERTIFICATE-----)";
-
-static const char* MQTT_SSL = R"(-----BEGIN CERTIFICATE-----
+static const char *MQTT_SSL = R"(-----BEGIN CERTIFICATE-----
 MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
 TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
 cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
@@ -93,47 +62,58 @@ String lastCommandTime = "";
 int scheduledOnHour = -1, scheduledOnMinute = -1;
 int scheduledOffHour = -1, scheduledOffMinute = -1;
 
-String cmd = "";  // "ON" | "OFF" | "AUTO"
-String source = "";  // "dashboard" | "mqtt_api" | "manual"
+String cmd = "";    // "ON" | "OFF" | "AUTO"
+String source = ""; // "dashboard" | "mqtt_api" | "manual"
 
-void setLight(bool state) {
+void setLight(bool state)
+{
   Serial.print("Turn Aquarium light ");
-  Serial.println(state?"ON":"OFF");
+  Serial.println(state ? "ON" : "OFF");
   lightState = state;
   digitalWrite(RELAY_PIN, state ? HIGH : LOW);
   digitalWrite(STATUS_LED_PIN, state ? LOW : HIGH); // Status LED
 }
 
-void handleCommandMessage(const String& topic, const String& payload) {
+void handleCommandMessage(const String &topic, const String &payload)
+{
   Serial.println("Handle command message");
-  if (topic == MQTT_TOPIC_CMD) {
+  if (topic == MQTT_TOPIC_CMD)
+  {
     ArduinoJson::DynamicJsonDocument doc(256);
     DeserializationError error = deserializeJson(doc, payload);
-    if (error) {
+    if (error)
+    {
       Serial.print(F("deserializeJson() failed: "));
       Serial.println(error.c_str());
       return;
     }
-    
-    cmd = doc["command"].as<String>();  // "ON" | "OFF" | "AUTO"
-    source = doc["source"].as<String>();  // "dashboard" | "mqtt_api" | "manual"
+
+    cmd = doc["command"].as<String>();   // "ON" | "OFF" | "AUTO"
+    source = doc["source"].as<String>(); // "dashboard" | "mqtt_api" | "manual"
 
     bool changed = false;
     bool success = true;
-  
-    if (cmd == "ON") {
+
+    if (cmd == "ON")
+    {
       setLight(true);
       currentMode = MANUAL;
-    } else if (cmd == "OFF") {
+    }
+    else if (cmd == "OFF")
+    {
       setLight(false);
       currentMode = MANUAL;
-    } else if (cmd == "AUTO") {
+    }
+    else if (cmd == "AUTO")
+    {
       currentMode = AUTO;
-    } else {
+    }
+    else
+    {
       currentMode = NONE;
       success = false;
     }
-    
+
     changed = (currentMode != prevMode);
     lastCommandTime = getTimestamp();
 
@@ -152,7 +132,9 @@ void handleCommandMessage(const String& topic, const String& payload) {
     publishMessage(MQTT_TOPIC_ACK, ack);
     publishStatus();
     prevMode = currentMode;
-  } else {
+  }
+  else
+  {
     Serial.print("ERROR: Topic mismatch! Expected ");
     Serial.print(MQTT_TOPIC_CMD);
     Serial.print(", but received ");
@@ -160,9 +142,11 @@ void handleCommandMessage(const String& topic, const String& payload) {
   }
 }
 
-void handleScheduleMessage(const String& topic, const String& payload) {
+void handleScheduleMessage(const String &topic, const String &payload)
+{
   Serial.println("Handle schedule message");
-  if (topic != MQTT_TOPIC_SCHEDULE) {
+  if (topic != MQTT_TOPIC_SCHEDULE)
+  {
     Serial.print("ERROR: Topic mismatch. Expected ");
     Serial.print(MQTT_TOPIC_SCHEDULE);
     Serial.print(", but received ");
@@ -173,7 +157,8 @@ void handleScheduleMessage(const String& topic, const String& payload) {
   DynamicJsonDocument doc(256);
   DeserializationError error = deserializeJson(doc, payload);
 
-  if (error) {
+  if (error)
+  {
     Serial.print("ERROR: Failed to parse schedule message: ");
     Serial.println(error.c_str());
     return;
@@ -187,14 +172,16 @@ void handleScheduleMessage(const String& topic, const String& payload) {
 
   // Validate time formats
   if (sscanf(onTime.c_str(), "%d:%d", &scheduledOnHour, &scheduledOnMinute) != 2 ||
-      sscanf(offTime.c_str(), "%d:%d", &scheduledOffHour, &scheduledOffMinute) != 2) {
+      sscanf(offTime.c_str(), "%d:%d", &scheduledOffHour, &scheduledOffMinute) != 2)
+  {
     Serial.println("ERROR: Invalid time format in schedule message. Expected HH:MM.");
     return;
   }
 
   // Optional: Validate hour and minute ranges
   if (scheduledOnHour < 0 || scheduledOnHour > 23 || scheduledOnMinute < 0 || scheduledOnMinute > 59 ||
-      scheduledOffHour < 0 || scheduledOffHour > 23 || scheduledOffMinute < 0 || scheduledOffMinute > 59) {
+      scheduledOffHour < 0 || scheduledOffHour > 23 || scheduledOffMinute < 0 || scheduledOffMinute > 59)
+  {
     Serial.println("ERROR: Invalid time values in schedule message.");
     return;
   }
@@ -215,59 +202,57 @@ void handleScheduleMessage(const String& topic, const String& payload) {
   ack["timestamp"] = getTimestamp(); // Assumes getTimestamp() returns ISO 8601 format in IST
   ack["success"] = true;
   ack["source"] = source;
-  
-  serializeJson(ack, Serial);  // Serialize and print JSON
-  Serial.println();  // Ensure a new line for better readability
-  
+
+  serializeJson(ack, Serial); // Serialize and print JSON
+  Serial.println();           // Ensure a new line for better readability
+
   Serial.println("Publish acknowledgement");
   publishMessage(MQTT_TOPIC_ACK, ack);
   publishStatus();
 }
 
-void handleScheduledLightControl() {
-  if (currentMode == AUTO) {
+void handleScheduledLightControl()
+{
+  if (currentMode == AUTO)
+  {
     int currentHour = getHourNow();
     int currentMinute = getMinuteNow();
-    Serial.print("Current time - ");
-    Serial.print(currentHour);
-    Serial.print(":");
-    Serial.println(currentMinute);
-
-    Serial.print("Schedule ON time - ");
-    Serial.print(scheduledOnHour);
-    Serial.print(":");
-    Serial.println(scheduledOnMinute);
-    
-    Serial.print("Schedule OFF time - ");
-    Serial.print(scheduledOffHour);
-    Serial.print(":");
-    Serial.println(scheduledOffMinute);
 
     bool shouldTurnOn = isTimeInRange(scheduledOnHour, scheduledOnMinute, scheduledOffHour, scheduledOffMinute);
 
-    if(lightState != shouldTurnOn) setLight(shouldTurnOn);  // Toggle aquarium light
+    if (lightState != shouldTurnOn)
+    {
+      Serial.print("Toggle light ");
+      Serial.print(lightState);
+      Serial.print(" to");
+      Serial.println(shouldTurnOn);
+
+      setLight(shouldTurnOn); // Toggle aquarium light
+    }
   }
 
-  if (millis() - lastStatusPublish > 1000*60*30) {  // Every 30 minutes
+  if (millis() - lastStatusPublish > 1000 * 60 * 30)
+  { // Every 30 minutes
     publishStatus();
     lastStatusPublish = millis();
   }
 }
 
-void setupMQTT() {
-//  Serial.begin(115200);
+void setupMQTT()
+{
+  //  Serial.begin(115200);
 
   // Define topic-callback mappings
   static MqttCallbackEntry callbacks[] = {
-    { MQTT_TOPIC_CMD, handleCommandMessage },
-    { MQTT_TOPIC_SCHEDULE, handleScheduleMessage }
-  };
+      {MQTT_TOPIC_CMD, handleCommandMessage},
+      {MQTT_TOPIC_SCHEDULE, handleScheduleMessage}};
 
   // Initialize MQTT
   initMQTT(MQTT_BROKER, MQTT_USERNAME, MQTT_PASSWORD, MQTT_PORT, MQTT_SSL, callbacks, sizeof(callbacks) / sizeof(callbacks[0]));
 }
 
-void publishStatus() {
+void publishStatus()
+{
   Serial.print("Publishing status message:");
   ArduinoJson::DynamicJsonDocument status(256);
   status["light_status"] = lightState ? "on" : "off";
@@ -280,7 +265,7 @@ void publishStatus() {
 
   // Serialize and print JSON
   serializeJson(status, Serial);
-  Serial.println();  // Ensure a new line for better readability
+  Serial.println(); // Ensure a new line for better readability
 
   publishMessage(MQTT_TOPIC_STATUS, status);
 }

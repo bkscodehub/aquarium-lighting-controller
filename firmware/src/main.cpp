@@ -12,7 +12,8 @@
 #define WIFI_PASSWORD "default_pass"
 #endif
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   pinMode(RELAY_PIN, OUTPUT);
@@ -25,13 +26,12 @@ void setup() {
   connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
   setupMQTT();
 
-  publishStatus();  // Initial status
-  
   Serial.println("Initialization completed!");
 }
 
-void loop() {
+void loop()
+{
   loopMQTT();
-  handleScheduledLightControl();  // Periodically check schedule
-  delay(15000);  // poll again after 15 seconds
+  handleScheduledLightControl(); // Periodically check schedule
+  delay(15000);                  // poll again after 15 seconds
 }
