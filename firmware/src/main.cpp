@@ -18,8 +18,8 @@ void setup()
 
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(STATUS_LED_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, LOW);
-  digitalWrite(STATUS_LED_PIN, HIGH); // Active low LED
+  digitalWrite(RELAY_PIN, HIGH);
+  digitalWrite(STATUS_LED_PIN, LOW);
 
   delay(5000);
   Serial.println("Initializing...");

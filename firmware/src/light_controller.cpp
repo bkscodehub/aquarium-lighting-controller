@@ -82,6 +82,7 @@ void initLightController()
       (state.scheduledOffMinute < -1 || state.scheduledOffMinute > 59))
   {
     // Uninitialized EEPROM or corrupted data; Reset persisted schedule
+    Serial.println("Schedule state in EEPROM not initialized or is corrupt. Resetting schedule state.");
     state.scheduledOnHour = -1;
     state.scheduledOnMinute = -1;
     state.scheduledOffHour = -1;
@@ -160,7 +161,7 @@ void handleCommandMessage(const String &topic, const String &payload)
       }
       else
       {
-        resp_msg = "Valid schedule not available. Update schedule first. Command Rejected!";
+        resp_msg = "Schedule not available. Update schedule first. Command Rejected!";
         success = false;
       }
     }
