@@ -65,6 +65,52 @@ int scheduledOffHour = -1, scheduledOffMinute = -1;
 String cmd = "";    // "ON" | "OFF" | "AUTO"
 String source = ""; // "dashboard" | "mqtt_api" | "manual"
 
+PersistentLightScheduleState state;
+const int EEPROM_SIZE = sizeof(PersistentLightScheduleState);
+
+void initLightController()
+{
+  EEPROM.begin(EEPROM_SIZE);
+
+  // Read stored state
+  EEPROM.get(0, state);
+
+  // Optional: Validate the retrieved data
+  if ((state.scheduledOnHour < -1 || state.scheduledOnHour > 23) &&
+      (state.scheduledOnMinute < -1 || state.scheduledOnMinute > 59) &&
+      (state.scheduledOffHour < -1 || state.scheduledOffHour > 23) &&
+      (state.scheduledOffMinute < -1 || state.scheduledOffMinute > 59))
+  {
+    // Uninitialized EEPROM or corrupted data; Reset persisted schedule
+    state.scheduledOnHour = -1;
+    state.scheduledOnMinute = -1;
+    state.scheduledOffHour = -1;
+    state.scheduledOffMinute = -1;
+    String timestamp = getTimestamp(); // Ensure getTimestamp() returns a string in ISO 8601 format
+    timestamp.toCharArray(state.scheduleDefinedOn, sizeof(state.scheduleDefinedOn));
+  }
+  else
+  {
+    Serial.print("Using persisted schedule. ON at ");
+    Serial.print(state.scheduledOnHour);
+    Serial.print(":");
+    Serial.print(state.scheduledOnMinute);
+    Serial.print(", OFF at ");
+    Serial.print(state.scheduledOffHour);
+    Serial.print(":");
+    Serial.print(state.scheduledOffMinute);
+    Serial.print(", Defined on ");
+    Serial.println(state.scheduleDefinedOn);
+
+    // If valid schedule exists in EEPROM then set to AUTO mode
+    if (state.scheduledOnHour != -1 && state.scheduledOnMinute != -1 && state.scheduledOffHour != -1 && state.scheduledOffMinute != -1)
+    {
+      Serial.println("Schedule exists during bootstrap. Setting mode to AUTO");
+      currentMode = AUTO;
+    }
+  }
+}
+
 void setLight(bool state)
 {
   Serial.print("Turning Aquarium light ");
@@ -94,6 +140,7 @@ void handleCommandMessage(const String &topic, const String &payload)
 
     bool changed = false;
     bool success = true;
+    String resp_msg = "";
 
     if (cmd == "ON")
     {
@@ -107,7 +154,15 @@ void handleCommandMessage(const String &topic, const String &payload)
     }
     else if (cmd == "AUTO")
     {
-      currentMode = AUTO;
+      if (state.scheduledOnHour != -1 && state.scheduledOnMinute != -1 && state.scheduledOffHour != -1 && state.scheduledOffMinute != -1)
+      {
+        currentMode = AUTO;
+      }
+      else
+      {
+        resp_msg = "Valid schedule not available. Update schedule first. Command Rejected!";
+        success = false;
+      }
     }
     else
     {
@@ -127,6 +182,7 @@ void handleCommandMessage(const String &topic, const String &payload)
     ack["changed"] = changed;
     ack["timestamp"] = lastCommandTime;
     ack["success"] = success;
+    ack["msg"] = resp_msg;
     ack["source"] = source;
 
     Serial.println("Publish acknowledgement");
@@ -146,7 +202,7 @@ void handleCommandMessage(const String &topic, const String &payload)
 void handleScheduleMessage(const String &topic, const String &payload)
 {
   Serial.println("Handle schedule message");
-  if (topic != MQTT_TOPIC_SCHEDULE)
+  if (topic == MQTT_TOPIC_SCHEDULE)
   {
     Serial.print("ERROR: Topic mismatch. Expected ");
     Serial.print(MQTT_TOPIC_SCHEDULE);
@@ -158,50 +214,75 @@ void handleScheduleMessage(const String &topic, const String &payload)
   DynamicJsonDocument doc(256);
   DeserializationError error = deserializeJson(doc, payload);
 
+  bool success = true;
+  String resp_msg = "";
+  String onTime = "";
+  String offTime = "";
+  String source = "unknown";
+  bool enabled = true;
   if (error)
   {
     Serial.print("ERROR: Failed to parse schedule message: ");
     Serial.println(error.c_str());
-    return;
+    // return;
+    success = false;
+    resp_msg = error.c_str();
   }
-
-  // Extract fields with default values
-  String onTime = doc["on"] | "";
-  String offTime = doc["off"] | "";
-  String source = doc["source"] | "unknown";
-  bool enabled = doc["enabled"] | true;
-
-  // Validate time formats
-  if (sscanf(onTime.c_str(), "%d:%d", &scheduledOnHour, &scheduledOnMinute) != 2 ||
-      sscanf(offTime.c_str(), "%d:%d", &scheduledOffHour, &scheduledOffMinute) != 2)
+  else
   {
-    Serial.println("ERROR: Invalid time format in schedule message. Expected HH:MM.");
-    return;
+
+    // Extract fields with default values
+    onTime = doc["on"] | "";
+    offTime = doc["off"] | "";
+    source = doc["source"] | "unknown";
+    enabled = doc["enabled"] | true;
+
+    // Validate time formats
+    if (sscanf(onTime.c_str(), "%d:%d", &state.scheduledOnHour, &state.scheduledOnMinute) != 2 ||
+        sscanf(offTime.c_str(), "%d:%d", &state.scheduledOffHour, &state.scheduledOffMinute) != 2)
+    {
+      Serial.println("ERROR: Invalid time format in schedule message. Expected HH:MM.");
+      // return;
+      success = false;
+      resp_msg = "ERROR: Invalid time format in schedule message. Expected HH:MM.";
+    }
+
+    // Optional: Validate hour and minute ranges
+    if (state.scheduledOnHour < 0 || state.scheduledOnHour > 23 || state.scheduledOnMinute < 0 || state.scheduledOnMinute > 59 ||
+        state.scheduledOffHour < 0 || state.scheduledOffHour > 23 || state.scheduledOffMinute < 0 || state.scheduledOffMinute > 59)
+    {
+      Serial.println("ERROR: Invalid time values in schedule message.");
+      // return;
+      success = false;
+      resp_msg = "ERROR: Invalid time values in schedule message.";
+    }
+
+    if (success)
+    {                                    // No validation errors
+      String timestamp = getTimestamp(); // Ensure getTimestamp() returns a string in ISO 8601 format
+      timestamp.toCharArray(state.scheduleDefinedOn, sizeof(state.scheduleDefinedOn));
+
+      // Write updated state to EEPROM
+      EEPROM.put(0, state);
+      EEPROM.commit();
+
+      Serial.print("Schedule set - ON at ");
+      Serial.print(state.scheduledOnHour);
+      Serial.print(":");
+      Serial.print(state.scheduledOnMinute);
+      Serial.print(", OFF at ");
+      Serial.print(state.scheduledOffHour);
+      Serial.print(":");
+      Serial.println(state.scheduledOffMinute);
+    }
   }
-
-  // Optional: Validate hour and minute ranges
-  if (scheduledOnHour < 0 || scheduledOnHour > 23 || scheduledOnMinute < 0 || scheduledOnMinute > 59 ||
-      scheduledOffHour < 0 || scheduledOffHour > 23 || scheduledOffMinute < 0 || scheduledOffMinute > 59)
-  {
-    Serial.println("ERROR: Invalid time values in schedule message.");
-    return;
-  }
-
-  Serial.print("Schedule set - ON at ");
-  Serial.print(scheduledOnHour);
-  Serial.print(":");
-  Serial.print(scheduledOnMinute);
-  Serial.print(", OFF at ");
-  Serial.print(scheduledOffHour);
-  Serial.print(":");
-  Serial.println(scheduledOffMinute);
-
   // Construct acknowledgment message
   DynamicJsonDocument ack(256);
   ack["ack_for"] = MQTT_TOPIC_SCHEDULE;
   ack["schedule_received"] = "On-" + onTime + ", Off-" + offTime;
   ack["timestamp"] = getTimestamp(); // Assumes getTimestamp() returns ISO 8601 format in IST
-  ack["success"] = true;
+  ack["success"] = success;
+  ack["msg"] = resp_msg;
   ack["source"] = source;
 
   serializeJson(ack, Serial); // Serialize and print JSON
@@ -219,7 +300,7 @@ void handleScheduledLightControl()
     int currentHour = getHourNow();
     int currentMinute = getMinuteNow();
 
-    bool shouldTurnOn = isTimeInRange(scheduledOnHour, scheduledOnMinute, scheduledOffHour, scheduledOffMinute);
+    bool shouldTurnOn = isTimeInRange(state.scheduledOnHour, state.scheduledOnMinute, state.scheduledOffHour, state.scheduledOffMinute);
 
     if (lightState != shouldTurnOn)
     {

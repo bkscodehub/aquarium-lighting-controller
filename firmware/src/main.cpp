@@ -23,6 +23,7 @@ void setup()
 
   delay(5000);
   Serial.println("Initializing...");
+  initLightController();
   connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
   setupMQTT();
 
