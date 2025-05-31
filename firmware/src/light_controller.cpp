@@ -203,7 +203,7 @@ void handleCommandMessage(const String &topic, const String &payload)
 void handleScheduleMessage(const String &topic, const String &payload)
 {
   Serial.println("Handle schedule message");
-  if (topic == MQTT_TOPIC_SCHEDULE)
+  if (topic != MQTT_TOPIC_SCHEDULE)
   {
     Serial.print("ERROR: Topic mismatch. Expected ");
     Serial.print(MQTT_TOPIC_SCHEDULE);
