@@ -18,7 +18,7 @@ void setup()
 
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(STATUS_LED_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, HIGH);
+  digitalWrite(RELAY_PIN, LOW);
   digitalWrite(STATUS_LED_PIN, LOW);
 
   delay(5000);
@@ -33,6 +33,7 @@ void setup()
 void loop()
 {
   loopMQTT();
+  handleWiFi();                  // Reconnect to WiFi if connection lost
   handleScheduledLightControl(); // Periodically check schedule
   delay(15000);                  // poll again after 15 seconds
 }
